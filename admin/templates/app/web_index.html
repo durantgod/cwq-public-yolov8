@@ -1,0 +1,348 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} 控制面板 {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+
+
+    <div class="row">
+                <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>作者推荐</h2>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div>
+                    <p>大家如果想要测试在线添加摄像头功能，身边又没有摄像头，推荐购买下面链接对应的摄像头。
+                        该摄像头支持RTSP/ONVIF/GB28181等协议，而且延迟比较小。是我找到的为数不多且支持多种协议的摄像头。
+                    </p>
+                    <a href="https://item.taobao.com/item.htm?ft=t&id=779352242743&skuId=5495281567912&spm=a21dvs.23580594.0.0.621e3d0dsplz0I" target="_blank">购买摄像头</a>
+                </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>CPU利用率</h2>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div id="cpuCharts" style="height:220px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>内存利用率</h2>
+
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div id="memoryCharts" style="height:220px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>存储利用率</h2>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div id="diskCharts" style="height:220px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+                <h2>系统信息</h2>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <table class="table table-hover">
+                <tbody>
+                  <tr>
+                    <th scope="row">运行</th>
+                    <th scope="row" id="os_run_date_str">00:00:00</th>
+                  </tr>
+                    <tr>
+                    <th scope="row">CPU</th>
+                    <th scope="row" id="os_cpu_used_rate">0%</th>
+                  </tr>
+
+                  <tr>
+                    <th scope="row">内存</th>
+                    <th scope="row" id="os_virtual_mem_used_rate">0%</th>
+                  </tr>
+
+                   <tr>
+                    <th scope="row">存储</th>
+                    <th scope="row" id="os_disk_used_rate">0%</th>
+                  </tr>
+                </tbody>
+              </table>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+    </div>
+
+
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+
+  <script src="/static/lib/highcharts/highcharts.js"></script>
+  <script src="/static/lib/highcharts/modules/exporting.js"></script>
+  <script src="/static/lib/highcharts-plugins/highcharts-zh_CN.js"></script>
+
+
+    <script>
+
+    Highcharts.setOptions({
+            global: {
+                    useUTC: false
+            }
+    });
+    function activeLastPointToolip(chart) {
+        let points = chart.series[0].points;
+        chart.tooltip.refresh(points[points.length -1]);
+    }
+    let cpuCharts = Highcharts.chart('cpuCharts', {
+		chart: {
+				type: 'spline',
+				marginRight: 10,
+				events: {
+                    load: function () {
+                        let chart = this;
+                        activeLastPointToolip(chart);
+                    }
+				}
+		},
+		title: {
+				text: null
+		},
+		xAxis: {
+				type: 'datetime',
+				tickPixelInterval: 150
+		},
+		 yAxis: [{
+            min:0,
+            title: {
+                text: null
+            },
+            showFirstLabel: true
+        }],
+		tooltip: {
+				formatter: function () {
+						return '<b>' + this.series.name + '</b><br/>' +
+								Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+								Highcharts.numberFormat(this.y, 2);
+
+
+				}
+		},
+		legend: {
+				enabled: false
+		},
+		series: [{
+				name: 'CPU利用率',
+				data: (function () {
+						// 生成随机值
+						var data = [],
+								time = (new Date()).getTime(),
+								i;
+						for (i = -9; i <= 0; i += 1) {
+								data.push({
+										x: time + i * 1000,
+										y: 0 //Math.random()
+								});
+						}
+
+						return data;
+				}())
+		}]
+    });
+    let memoryCharts = Highcharts.chart('memoryCharts', {
+		chart: {
+				type: 'spline',
+				marginRight: 10,
+				events: {
+                    load: function () {
+                        let chart = this;
+                        activeLastPointToolip(chart);
+                    }
+				}
+		},
+		title: {
+		    text: null
+		},
+		xAxis: {
+				type: 'datetime',
+				tickPixelInterval: 150
+		},
+		 yAxis: [{ // 第一个 Y 轴，放置在左边（默认在坐标）
+            title: {
+                text: null
+            },
+            showFirstLabel: true
+        }],
+		tooltip: {
+				formatter: function () {
+						return '<b>' + this.series.name + '</b><br/>' +
+								Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+								Highcharts.numberFormat(this.y, 2);
+				}
+		},
+		legend: {
+				enabled: false
+		},
+		series: [{
+				name: '内存利用率',
+				data: (function () {
+						// 生成随机值
+						var data = [],
+								time = (new Date()).getTime(),
+								i;
+						for (i = -9; i <= 0; i += 1) {
+								data.push({
+										x: time + i * 1000,
+										y: 0 //Math.random()
+								});
+						}
+
+						return data;
+				}())
+		}]
+    });
+    let diskCharts = Highcharts.chart('diskCharts', {
+		chart: {
+				type: 'spline',
+				marginRight: 10,
+				events: {
+                    load: function () {
+                        let chart = this;
+                        activeLastPointToolip(chart);
+                    }
+				}
+		},
+		title: {
+				text: null
+		},
+		xAxis: {
+				type: 'datetime',
+				tickPixelInterval: 150
+		},
+		 yAxis: [{
+            min:0,
+            title: {
+                text: null
+            },
+            showFirstLabel: true
+        }],
+		tooltip: {
+				formatter: function () {
+						return '<b>' + this.series.name + '</b><br/>' +
+								Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+								Highcharts.numberFormat(this.y, 2);
+
+
+				}
+		},
+		legend: {
+				enabled: false
+		},
+		series: [{
+				name: '磁盘利用率',
+				data: (function () {
+						// 生成随机值
+						var data = [],
+								time = (new Date()).getTime(),
+								i;
+						for (i = -9; i <= 0; i += 1) {
+								data.push({
+										x: time + i * 1000,
+										y: 0 //Math.random()
+								});
+						}
+
+						return data;
+				}())
+		}]
+    });
+
+
+    function dataUpdater() {
+        $.ajax({
+           url: '/api/getIndex',
+           type: "get",
+           async: true,
+           data: {},
+           dataType: "json",
+           timeout: "3000",
+           error: function () {
+                myAlert("网络异常，请确定网络正常！","error");
+           },
+           success: function (res) {
+               if(1000 === res.code){
+
+                    let os_info = res["os_info"];
+                    let os_cpu_used_rate = os_info["os_cpu_used_rate"];
+                    let os_virtual_mem_used_rate = os_info["os_virtual_mem_used_rate"];
+                    let os_disk_used_rate = os_info["os_disk_used_rate"];
+
+                    let os_cpu_used_rate_str = os_info["os_cpu_used_rate_str"];
+                    let os_virtual_mem_used_rate_str = os_info["os_virtual_mem_used_rate_str"];
+                    let os_disk_used_rate_str = os_info["os_disk_used_rate_str"];
+
+                    let os_run_date_str = os_info["os_run_date_str"];
+
+                    $("#os_run_date_str").html(os_run_date_str);
+                    $("#os_cpu_used_rate").html(os_cpu_used_rate_str);
+                    $("#os_virtual_mem_used_rate").html(os_virtual_mem_used_rate_str);
+                    $("#os_disk_used_rate ").html(os_disk_used_rate_str);
+
+
+                    let x = (new Date()).getTime();
+
+                    cpuCharts.series[0].addPoint([x, os_cpu_used_rate], true, true);
+                    activeLastPointToolip(cpuCharts);
+                    memoryCharts.series[0].addPoint([x, os_virtual_mem_used_rate], true, true);
+                    activeLastPointToolip(memoryCharts);
+                    diskCharts.series[0].addPoint([x, os_disk_used_rate], true, true);
+                    activeLastPointToolip(diskCharts);
+
+                    setTimeout(function () {
+                        dataUpdater();
+                    }, 3000);
+
+               }else{
+                    myAlert(res.msg,"error");
+               }
+           }
+        });
+    }
+
+    window.onload = function (){
+        dataUpdater();
+    };
+
+
+</script>
+{% endblock javascripts %}
+

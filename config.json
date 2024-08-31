@@ -1,0 +1,16 @@
+{
+  "version": "3.41",
+  "host": "192.168.10.43",
+  "adminPort": 9001,
+  "mediaHttpPort": 9002,
+  "analyzerPort": 9003,
+  "mediaRtspPort": 9554,
+  "mediaSecret": "aqxY9ps21fyhyKNRyYpGvJCTp1JBeGOM",
+  "uploadDir": "D:\\videoUpload",
+  "videoFileNameFormat": "%Y%m%d%H%M%S",
+  "recordLogInterval": 30,
+  "workerConcurrency": 20,
+  "algorithmApiUrl": "http://192.168.10.43:9702/algorithm",
+  "onnxModelPath": "D:\\github\\hhd-link-ai-video831\\analyzer\\models\\yolov8n.onnx",
+  "orthModelPath": "D:\\github\\hhd-link-ai-video831\\analyzer\\models\\hatbest.onnx"
+}

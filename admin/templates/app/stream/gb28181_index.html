@@ -1,0 +1,63 @@
+{% extends "app/base_site.html" %}
+{% block title %} 国标gb28181接入 {% endblock title %}
+{% block stylesheets %}
+  {{ block.super }}
+<style>
+    input[type="file"]{
+      color: #8d2f2f;
+      font-size: 12px;
+    }
+    ::file-selector-button{
+      font-size: 12px;
+      color: #fff;
+      border-radius: 4px;
+      border: 1px solid #2a80eb;
+      padding: 2px 4px;
+      background-color: #2a80eb;
+      cursor: pointer;
+    }
+
+</style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+
+     <div class="row">
+
+        <!--add history start-->
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                 <h2>国标gb28181接入
+                    <span id="top_loading" ><img class="top_loading_img" src="/static/images/load.gif" alt="loading">加载中</span>
+                    <span id="top_msg">{{top_msg}}</span>
+                 </h2>
+                     <span style="margin-left: 10px;color: red;">当前版本还未支持gb28181接入，后续版本会支持</span>
+                     <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+
+                </div>
+
+              </div>
+            </div>
+      <!--add history end-->
+        </div>
+
+
+    </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super }}
+<script>
+
+
+</script>
+
+{% endblock javascripts %}

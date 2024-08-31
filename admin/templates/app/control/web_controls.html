@@ -1,0 +1,265 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} 布控管理 {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="row">
+      <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>布控管理
+            <span id="top_loading" ><img class="top_loading_img" src="/static/images/load.gif" alt="loading">加载中</span>
+             <span id="top_msg"></span>
+          </h2>
+          <div class="clearfix"></div>
+        </div>
+
+        <div class="x_content">
+          <!--<p><code>msg</code></p>-->
+
+          <div class="table-responsive">
+            <table class="table table-striped jambo_table bulk_action">
+              <thead>
+                <tr class="headings">
+                  <th class="column-title">ID </th>
+                  <th class="column-title">编号 </th>
+                  <th class="column-title">视频流 </th>
+                  <th class="column-title">算法流 </th>
+
+                  <th class="column-title">状态 </th>
+                  <th class="column-title">算法 </th>
+
+                  <th class="column-title">fps </th>
+                  <th class="column-title">状态 </th>
+                  <th class="column-title">添加时间 </th>
+                  <th class="column-title no-link last"><span class="nobr">操作</span></th>
+                </tr>
+              </thead>
+
+              <tbody id="data">
+              </tbody>
+            </table>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super }}
+
+<script>
+
+    let eleData = $("#data");
+    let ele_top_loading = $("#top_loading");
+    let ele_top_msg= $("#top_msg");
+
+
+    function f_del(controlCode) {
+           ele_top_loading.show();
+        $.ajax({
+               url: 'api/postDelControl',
+               type: "post",
+               async: true,
+               data: {"controlCode":controlCode},
+               dataType: "json",
+               timeout: 0,
+               error: function () {
+                   ele_top_loading.hide();
+                   myAlert("网络异常，请确定网络正常！","error");
+               },
+               success: function (res) {
+                      ele_top_loading.hide();
+                   if(1000 === res.code){
+                       f_getControls();
+                   }else{
+                        myAlert(res.msg,"error");
+                   }
+               }
+            });
+
+    }
+    function f_open_player(stream_app,stream_name){
+        window.open("/stream/player?app="+stream_app+"&name="+stream_name);
+    }
+    function f_getControls() {
+        ele_top_loading.show();
+        $.ajax({
+               url: '/api/getControls',
+               type: "get",
+               async: true,
+               data: {},
+               dataType: "json",
+               timeout: 0,
+               error: function () {
+                   ele_top_loading.hide();
+                   myAlert("网络异常，请确定网络正常！","error");
+               },
+               success: function (res) {
+                   ele_top_loading.hide();
+                   let ananyServerState = res.ananyServerState;
+                   let medisServerState = res.medisServerState;
+                   let serverState = res.serverState;
+                   ele_top_msg.html(serverState);
+
+                   if(1000 === res.code){
+                       eleData.html("");
+                       let data = res.data;
+                       let data_length = data.length;
+                       let item_html = "";
+
+                       if(0===data_length){
+                          item_html += "<tr class=\"even pointer\">";
+                          item_html += "<td colspan='11'>暂无数据</td>";
+                          item_html += "</tr>";
+                       }else{
+
+                            for (let i = 0; i < data_length; i++) {
+                               let d = data[i];
+
+                               item_html += "<tr class=\"even pointer\">";
+                               item_html += "<td>"+d["id"]+"</td>";
+                               item_html += "<td>"+d["code"]+"</td>";
+                               item_html += "<td><a class='sun-a-label'  href=\"javascript:f_open_player('"+d["stream_app"]+"','"+d["stream_name"]+"')\" >"+d["stream_app"]+"/"+d["stream_name"]+"</a></td>";
+                                                              if(0===d["push_stream"]){
+
+                                   item_html += "<td>无</td>";
+                               }else{
+                                   item_html += "<td><a class='sun-a-label' href=\"javascript:f_open_player('"+d["push_stream_app"]+"','"+d["push_stream_name"]+"')\" >播放算法流</a></td>"
+
+                               }
+
+                               if(d["stream_active"] === 1){
+                                   item_html += "<td><span class='sun-state-success'>在线</span></td>";
+                               }else{
+                                   item_html += "<td><span class='sun-state-error'>离线</span></td>";
+                                }
+
+                               item_html += "<td>"+d["algorithm_name"]+"</td>";
+
+
+
+                               item_html += "<td>"+d["checkFps"]+"</td>";
+
+                               if(0===d["cur_state"]){
+                                   item_html += "<td><span class='sync_state_latest-" + d["code"] + " sun-state-info'>未布控</span></td>";
+                               }else if(1===d["cur_state"]){
+                                    item_html += "<td><span class='sync_state_latest-" + d["code"] + " sun-state-success'>布控中</span></td>";
+                               }else if(5===d["cur_state"]){
+                                    item_html += "<td><span class='sync_state_latest-" + d["code"] + " sun-state-error'>布控中断</span></td>";
+                               }else{
+                                    item_html += "<td><span class='sync_state_latest-" + d["code"] + " sun-state-error'>未知状态</span></td>";
+                               }
+                               item_html += "<td>"+d["create_time"]+"</td>";
+                               item_html += "<td>";
+                               item_html += "<a href=\"/control/edit?code="+d["code"]+"\"  class='sun-a-label' style='margin-right: 8px;' > 编辑</a>";
+                               item_html += "<a href=\"javascript:f_del('"+d["code"]+"')\"  class='sun-a-label' style='margin-right: 8px;' > 删除</a>";
+                                if(1===d["cur_state"]) {
+                                    item_html += "<button data-code='" + d["code"] + "'  data-handle='cancel' onclick=\"f_postHandleAnalyzer(this)\" class=\"btn btn-dark btn-xs\"><i class=\"fa fa-cube\"></i> 取消布控</button>";
+                                }else{
+                                    item_html += "<button data-code='" + d["code"] + "'  data-handle='add'onclick=\"f_postHandleAnalyzer(this)\"class=\"btn btn-primary btn-xs\"><i class=\"fa fa-cube\"></i> 执行布控</button>";
+
+                                }
+                               item_html += "</td></tr>";
+                           }
+                        }
+                        eleData.append(item_html);
+
+                        //setTimeout(function () {
+                            //getControls();
+                        //}, 4000);
+
+                   }else{
+                        myAlert(res.msg,"error");
+                   }
+               }
+            });
+
+    }
+    function f_postHandleAnalyzer(obj) {
+        console.log(typeof obj,obj)
+        //obj.getAttribute("data-handle"); // js 获取 data-handle属性
+        //obj.setAttribute("data-handle","123") // js 修改 data-handle属性
+
+        let jqueryObj = $(obj);
+        let handle = jqueryObj.data("handle");
+        //jqueryObj.data("handle","123");
+        let code = jqueryObj.data("code");
+
+        console.log(handle,code)
+
+        let jqueryObj_sync_state_latest = $(".sync_state_latest-"+code);
+
+        //let value= handle.target.getAttribute("data-value");
+        //let value = $(this).data("value")
+
+        console.log(jqueryObj_sync_state_latest.text())
+
+
+        let handleUrl;
+        if ('add'===handle){
+            handleUrl = '/api/postAddAnalyzer';
+        }else if('cancel'===handle){
+            handleUrl = '/api/postCancelAnalyzer';
+        }else{
+            return;
+        }
+        ele_top_loading.show();
+        $.ajax({
+           url: handleUrl,
+           type: "post",
+           async: true,
+           data: {"controlCode":code},
+           dataType: "json",
+           timeout: 0,
+           error: function () {
+                ele_top_loading.hide();
+                myAlert("网络异常，请确定网络正常！","error");
+           },
+           success: function (res) {
+               ele_top_loading.hide();
+               if(1000 === res.code){
+                   myAlert(res.msg,"success",1000);
+                   if("add"===handle){
+                       jqueryObj.removeClass("btn-primary")
+                       jqueryObj.addClass("btn-dark")
+                       jqueryObj.data("handle","cancel");
+                       jqueryObj.html("<i class=\"fa fa-cube\"></i>取消布控");
+                       jqueryObj_sync_state_latest.html("<span class='sync_state_latest-" + code + " sun-state-success'>布控中</span>");
+
+                   }else if('cancel'===handle){
+                       jqueryObj.removeClass("btn-dark")
+                       jqueryObj.addClass("btn-primary")
+                       jqueryObj.data("handle","add");
+                       jqueryObj.html("<i class=\"fa fa-cube\"></i>执行布控")
+                       jqueryObj_sync_state_latest.html("<span class='sync_state_latest-" + code + " sun-state-info'>未布控</span>")
+                   }
+
+               }else{
+                   myAlert(res.msg,"error");
+               }
+           }
+        });
+    }
+    window.onload = function (){
+        f_getControls();
+    };
+
+
+</script>
+{% endblock javascripts %}
+

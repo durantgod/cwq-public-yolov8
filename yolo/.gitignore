@@ -1,0 +1,10 @@
+﻿# clion
+.idea/
+log/*
+# vs
+.vs
+controllers/__pycache__
+venv*
+log*
+
+

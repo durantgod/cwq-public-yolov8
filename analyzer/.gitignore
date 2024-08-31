@@ -1,0 +1,12 @@
+﻿# clion
+.idea/
+cmake-build-debug/*
+
+# vs
+.vs
+Analyzer/x64/*
+x64/Debug/Analyzer.*
+x64/Release/Analyzer.*
+
+
+

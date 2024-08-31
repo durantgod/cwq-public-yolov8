@@ -1,0 +1,127 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} 算法管理 {% endblock title %}
+
+{% block stylesheets %}
+    {{ block.super }}
+{% endblock stylesheets %}
+
+{% block content %}
+    <!-- 引入 layui.css -->
+    <link href="//unpkg.com/layui@2.9.7/dist/css/layui.css" rel="stylesheet">
+    <style>
+        .behavior-remark {
+            float: left;
+            width: 100%;
+            max-width: 200px;
+            height: 100%;
+            font-size: 14px;
+            color: #333;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="row">
+
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>算法管理</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+
+                            <div class="table-responsive">
+                                <table class="table table-striped jambo_table bulk_action">
+                                    <thead>
+                                    <tr class="headings">
+                                        <th class="column-title">序号</th>
+                                        <th class="column-title">算法编号</th>
+                                        <th class="column-title">算法名称</th>
+                                        <th class="column-title">分类数量</th>
+                                        <th class="column-title">算法分类</th>
+                                        <th class="column-title">算法备注</th>
+                                        <th class="column-title last">操作</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    {% for d in data %}
+                                        <tr class="even pointer">
+                                            <td style="width: 15px;">{{ forloop.counter }}</td>
+                                            <td style="width: 50px;">{{ d.code }}</td>
+                                            <td style="width: 100px;">{{ d.name }}</td>
+                                            <td style="width: 80px;">{{ d.object_count }}</td>
+                                            <td style="width: 300px;"><p style="width: 300px; word-wrap: break-word;">{{ d.objects }}</p></td>
+                                            <td><span class="behavior-remark">{{ d.remark }}</span></td>
+                                            <td>
+                                                <form method="post" style="display:inline;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="algorithm_id" value="{{ d.id }}">
+                                                    <button type="submit" name="delete"
+                                                            class="layui-btn layui-btn-danger">删除
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <br>
+                          <form class="form-horizontal form-label-left"  method="post" enctype="multipart/form-data" data-parsley-validate  >
+
+                         <div class="form-group">
+                              <label class="control-label col-md-3 col-sm-3 col-xs-12">算法编号 <span class="required">*</span></label>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                <input type="text" name="code" required="required"  class="form-control">
+                              </div>
+                            </div>
+
+                           <div class="form-group">
+                              <label class="control-label col-md-3 col-sm-3 col-xs-12">算法名称 <span class="required">*</span></label>
+                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                <input type="text" name="name" required="required"  class="form-control">
+                              </div>
+                            </div>
+
+
+                              <div class="form-group">
+                              <label class="control-label col-md-3 col-sm-3 col-xs-12">算法分类 <span class="required">*</span>
+                              </label>
+                              <div class="col-md-9 col-sm-9 col-xs-12">
+                                <textarea name="objects" class="form-control" rows="3" placeholder=""></textarea>
+                              </div>
+                            </div>
+
+                              <div class="form-group">
+                              <label class="control-label col-md-3 col-sm-3 col-xs-12">算法备注 <span class="required">*</span>
+                              </label>
+                              <div class="col-md-9 col-sm-9 col-xs-12">
+                                <textarea name="remark" class="form-control" rows="3" placeholder=""></textarea>
+                              </div>
+                            </div>
+
+                            <div class="form-group">
+                              <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
+                                <button type="submit" class="btn btn-success" name="add">提交</button>
+                              </div>
+                            </div>
+
+                          </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block javascripts %}
+    {{ block.super }}
+{% endblock javascripts %}

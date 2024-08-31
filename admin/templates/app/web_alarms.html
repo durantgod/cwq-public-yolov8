@@ -1,0 +1,212 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} 报警视频管理 {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+{% endblock stylesheets %}
+
+{% block content %}
+<style>
+  .alarm_item {
+    display: block;
+    /*padding: 4px;*/
+    /*margin-bottom: 20px;*/
+    line-height: 1.42857143;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    -webkit-transition: border .2s ease-in-out;
+    -o-transition: border .2s ease-in-out;
+    transition: border .2s ease-in-out;
+}
+.alarm_item_bottom {
+    padding: 7px 5px;
+    /* background: #F7F7F7; */
+}
+</style>
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>报警视频管理 <span id="top_msg">{{top_msg}}</span></h2>
+
+              <label style="margin-left:20px;padding-top:5px;">
+                <input type="checkbox" class="check_all">全选
+              </label>
+                <button style="margin-left:5px;" onclick="onAllRead()" class="btn btn-default">已读</button>
+                <button style="margin-left:2px;" onclick="onAllDelete()" class="btn btn-default">删除</button>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+
+              <div class="row">
+
+               <!-- <p>Media gallery design emelents</p>-->
+                {%  for d  in data%}
+                  <div class="col-md-55">
+                    <div class="alarm_item">
+                      <div class="image view view-first">
+                       <!-- <img style="width: 100%; display: block;" src="{{ d.imageUrl }}" alt="image" />-->
+                        <video controls muted loop preload="none" style="width: 100%; display: block;" poster="{{ d.imageUrl }}" src="{{ d.videoUrl }}" >
+                        </video>
+                        <!-- video介绍 http://yige.org/html5/att_video_preload.php-->
+
+                        <!--<div class="mask">
+                          <p>Your Text</p>
+                          <div class="tools tools-bottom">
+                            <a href="#"><i class="fa fa-link"></i></a>
+                            <a href="#"><i class="fa fa-pencil"></i></a>
+                            <a href="#"><i class="fa fa-times"></i></a>
+                          </div>
+                        </div>-->
+                      </div>
+                      <div class="alarm_item_bottom">
+                        {% if  0 == d.state %}
+                            <span><span style="font-size:14px;font-weight: 400;">{{d.id}}</span><span style="background-color:#1ABB9C !important;border-radius: 2px;font-size:12px;font-weight: 400;padding:2px;color:#ffffff;margin:0 3px;">未读</span> {{ d.desc }}</span>
+                        {% endif %}
+
+                       <div style="position: relative; display: block;">
+                          <label style="float:left;">
+                            <input type="checkbox" class="check_item" value="{{d.id}}">
+                          </label>
+                          <span style="margin-left:5px;">
+                                {{ d.create_time }}
+                          </span>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+
+              </div>
+              <div class="row">
+
+                <div class="col-sm-12">
+                  <div style="float: left;text-align: right;">
+                    <ul class="pagination">
+                        <li>
+                            <span style="margin-right:10px;color:#000;">共<span>{{ pageData.page_num}}</span>页 / <span>{{pageData.count}}</span >条</span>
+                        </li>
+
+                        {%  for d  in pageData.pageLabels%}
+                          {% if d.cur == 1 %}
+                            <li class="paginate_button active"><a href="#"  >{{ d.name }}</a></li>
+                          {% else %}
+                            <li class="paginate_button "><a href="/alarms?p={{d.page}}&ps={{pageData.page_size}}" >{{ d.name }}</a></li>
+                          {% endif %}
+                        {% endfor %}
+
+                      <!--
+                      <li class="paginate_button previous" ><a href="#" data-dt-idx="0" >上一页</a></li>
+                      <li class="paginate_button active"><a href="#" data-dt-idx="1" >1</a></li>
+
+                      <li class="paginate_button "><a href="#" data-dt-idx="2">2</a></li>
+                      <li class="paginate_button "><a href="#" data-dt-idx="3">3</a></li>
+                      <li class="paginate_button "><a href="#" data-dt-idx="4">4</a></li>
+                      <li class="paginate_button "><a href="#" data-dt-idx="5" >5</a></li>
+                      <li class="paginate_button "><a href="#" data-dt-idx="6" >6</a></li>
+                      <li class="paginate_button next"><a href="#" data-dt-idx="7" >下一页</a></li>
+                      -->
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super }}
+
+<script>
+function play(app,name){
+    let url = "/player?app="+app+"&name="+name;
+    window.location.href = url;
+}
+let ele_check_all = $(".check_all");
+ele_check_all.click(function() {
+  $(".check_item").prop("checked", $(this).prop("checked"));
+});
+function get_alarm_ids_str(){
+    let alarm_ids = [];
+    $('.check_item').each(function(e) {
+        //console.log("---------------------")
+        //console.log($(e));
+        //console.log($(this));
+        //console.log(e);
+        //console.log(this);
+        //console.log($(this).prop("checked"));
+        //console.log($(this).attr("value"));
+        let is_check = $(this).prop("checked");// boolean 是否选中
+        let alarm_id = $(this).attr("value");  // string 报警视频id
+        //console.log(is_check,typeof is_check);
+        //console.log(alarm_id,typeof alarm_id);
+        if(is_check){
+            alarm_ids.push(alarm_id);
+        }
+    });
+    let alarm_ids_str = alarm_ids.join(",");
+    //console.log("alarm_ids=",alarm_ids,typeof alarm_ids);
+    //console.log("alarm_ids_str=",alarm_ids_str,typeof alarm_ids_str);
+
+    return alarm_ids_str;
+}
+
+function postHandleAlarm(handle,alarm_ids_str){
+    $.ajax({
+        url: '/api/postHandleAlarm',
+        type: "post",
+        async: true,
+        data: {"handle":handle,"alarm_ids_str":alarm_ids_str},
+        dataType: "json",
+        timeout: "3000",
+        error: function () {
+            myAlert("网络异常，请确定网络正常！", "error");
+        },
+        success: function (res) {
+            if(1000===res.code){
+                myAlert(res.msg,"success",1000);
+                setTimeout(function () {
+                    window.location.reload();
+                 }, 1000);
+            }else{
+                myAlert(res.msg,"error");
+            }
+        }
+    });
+}
+function onAllRead(){
+    alarm_ids_str = get_alarm_ids_str();
+    console.log("alarm_ids_str=",alarm_ids_str,typeof alarm_ids_str);
+    if(""===alarm_ids_str){
+        myAlert("请至少选中一条数据","error");
+    }else{
+        postHandleAlarm('read',alarm_ids_str);
+    }
+
+}
+function onAllDelete(){
+    alarm_ids_str = get_alarm_ids_str();
+    console.log("alarm_ids_str=",alarm_ids_str,typeof alarm_ids_str);
+    if(""===alarm_ids_str){
+        myAlert("请至少选中一条数据","error");
+    }else{
+        postHandleAlarm('delete',alarm_ids_str);
+    }
+}
+
+
+ setTimeout(function () {
+    //window.location.reload();
+ }, 12000);
+</script>
+{% endblock javascripts %}
+
