@@ -63,7 +63,7 @@ python main.py
 ![](https://wqknowledge.oss-cn-shenzhen.aliyuncs.com/LLM/sz1.png)
 
 
-注意， 以下文件夹中压缩文件需要解压：
-analyzer\3rdparty\onnxruntime\lib
-cwq-public-yolov8\demo\exe
-analyzer/3rdparty/opencv/x64/vc15/bin/
+- 注意！！！ 以下文件夹中压缩文件需要解压：
+  - analyzer\3rdparty\onnxruntime\lib
+  - cwq-public-yolov8\demo\exe
+  - analyzer/3rdparty/opencv/x64/vc15/bin/
