@@ -1,6 +1,5 @@
-# hhd-link-ai-video
-
-航鸿达科技-视频ai识别项目
+# cwq-public-yolov8 
+视频ai识别项目
 
 ### 整个YoloV8视频识别系统主要包括：admin管理端，media流媒体端，分析端analyzer(c++), 模型端yolo
 ![](https://wqknowledge.oss-cn-shenzhen.aliyuncs.com/LLM/yolov8.svg)
